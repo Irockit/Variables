@@ -1,45 +1,53 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
-  <name>Variables</name>
-  <id>org.inkscape.board_game.variables</id>
+<?xml version="1.0" encoding="UTF-8"?><inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
+  <name>Variables</name><id>org.inkscape.board_game.variables</id>
 
-  <param name="tab" type="notebook">
-    <label appearance="header">Input options</label>
-    <page name="config" gui-text="Options">
-      <param name="reset_default" type="boolean" gui-text="Reset default values in file after export">true</param>
-      <param gui-text="CSV file:" gui-description="Template file with tokens" name="csv_file" type="path" mode="file" filetypes="csv">
-        /path/to/file.csv
+
+
+
+
+
+<param name="tab" type="notebook">
+  <label appearance="header">Input options</label>
+
+
+  <page name="config" gui-text="Options">
+
+    <param name="reset_default" type="boolean" gui-text="Reset default values in file after export">true</param>
+    <param gui-text="CSV file:" gui-description="Template file with tokens" name="csv_file" type="path" mode="file" filetypes="csv">
+      /path/to/file.csv
+    </param>
+
+      <spacer/><separator></separator><spacer/>
+
+      <label appearance="header">Output options</label>
+      <hbox>
+      <param name="format" type="optiongroup" appearance="combo" gui-text="Format:">
+        <option value="png">PNG</option><option value="pdf">PDF</option><option value="svg">SVG</option>
+        <option value="ps">PS</option><option value="eps">EPS</option>
       </param>
-       <spacer />
-        <separator></separator>
-        <spacer />
 
-        <label appearance="header">Output options</label>
+      <param gui-text="DPI: " gui-description="The resolution for your exported raster images"
+              name="dpi" type="int" min="1" max="10000">300</param>
+      </hbox>
+      <param gui-text="Translations" gui-description="String used for translation ex: en|fr|jap"
+              name="translations" type="string">en|fr</param>
+      <param gui-text="File name"
+              gui-description="name of the file + number"
+              name="output_name" type="string" >%VAR_my_variable_name%</param>
+      <param gui-text="Save in:" gui-description="The name of the folder where the generated images should be saved"          
+              name="output_folder" type="path" mode="folders" >/tmp</param>
+      <param name="parallel" type="boolean" gui-text="Save files in parallel">true</param>
 
-        <param name="format" type="optiongroup" appearance="combo" gui-text="Export file format:">
-          <option value="png">PNG</option><option value="pdf">PDF</option><option value="svg">SVG</option>
-          <option value="ps">PS</option><option value="eps">EPS</option>
-        </param>
+  </page>
 
-        <param gui-text="DPI (for PNG and filters):" gui-description="The resolution for your exported raster images"
-               name="dpi" type="int" min="1" max="10000">300</param>
-        <param gui-text="File name"
-               gui-description="name of the file + number"
-               name="output_name" type="string" >%VAR_my_variable_name%</param>
-        <param gui-text="Save in:" gui-description="The name of the folder where the generated images should be saved"          
-               name="output_folder" type="path" mode="folders" >/tmp</param>
-        <param name="parallel" type="boolean" gui-text="Save files in parallel">true</param>
 
-    </page>
-  </param>
+</param>
 
-  <effect>
-    <object-type>all</object-type>
-    <effects-menu>
-      <submenu name="Variables"/>
-    </effects-menu>
-  </effect>
-  <script>
-    <command location="inx" interpreter="python">variables_replacement_extension.py</command>
-  </script>
-</inkscape-extension>
+
+
+
+
+
+  <effect needs-live-preview="false"><object-type>all</object-type><effects-menu><submenu name="Variables"/></effects-menu></effect>
+  <script><command location="inx" interpreter="python">variables_replacement_extension.py</command></script>
+  </inkscape-extension>

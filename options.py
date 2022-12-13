@@ -11,6 +11,7 @@ class Options:
             "output_name":      [str, "pattern for the output file", {}],
             "reset_default":    [inkex.Boolean, "Keeps the values on the main file", {"default": True}],
             "parallel":         [inkex.Boolean, "Execute The extension in parallel", {"default": True}],
+            "translations":     [str, "Localisations string", {}]
         }
 
     @classmethod

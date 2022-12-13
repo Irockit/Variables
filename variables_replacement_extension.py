@@ -24,77 +24,115 @@ Description of this extension
 import inkex
 from argparse import ArgumentParser
 
-from tags import CsvTags, TagType
-from svg_processing import SVGProcessing
-
-from inkex.elements import load_svg, SvgDocumentElement
+from tags import Tags, InputInfo
+from inkex.elements import SvgDocumentElement
+#from svg_processing import SVGProcessing
+from input_tag import InputTags, InputTagValues
+from document_tag import DocumentTags, DocumentTag, DocumentId
 import copy, time
 from concurrent.futures import ThreadPoolExecutor as tp
+from inkex.elements._selected import ElementList
 from options import Options
 from exporter import Exporter
+from _types import TagType, TagName, Language
+from svg_cache import SvgCache
 
+class Document:
+    debug = None
+    index: int = 0
+    data = None
+    root = None
+    language: str
 
+    def __init__(self, document, index: int, language: Language, debug) -> None:
+        self.debug = debug
+        self.index = index
+        self.data = copy.deepcopy(document)
+        self.root = self.data.getroot()
+        self.language = language
 
+    def update_and_save(self, output_name):
+        self.change_variables()
+        self.save(output_name)
 
-class VariablesReplacementExtension(inkex.base.TempDirMixin, inkex.TextExtension):
-
-    def effect(self):
-        start = time.perf_counter()
-        self.exporter = Exporter(self.options.format, self.tempdir, self.options.output_folder, options= {"dpi": self.options.dpi})
-        self.csv_tags = CsvTags(self.options.csv_file, self.debug)
-        self.svg_process = SVGProcessing(self.get_nodes(), self.debug)
-        self.svg_process.get_tagged_ids()
-        root = self.get_root()
-
-        # self.debug("csv: {0}".format(str(self.csv_tags.tags)))
-        # self.debug("svg: {0}".format(str(self.svg_process.tags.tags)))
-
-        self.execute_parallel() if self.options.parallel else self.execute()
-        
-        end = time.perf_counter()
-        self.debug("saves: Completed in {0} seconds.".format(end-start))
-        self.reset_defaults(root)
+    def change_variables(self):
+        for name, tag in Tags.csv_info.tags.tags():
+            tag_type: TagType
+            values: InputTagValues
+            (tag_type, values) = tag
+            self.change_variable(name, values, tag_type, tag.languages)
     
-    def execute_parallel(self):
-        with tp() as ex: [ex.submit(self.update_and_export, i, copy.deepcopy(self.document)) for i in range(self.csv_tags.row_count)]
+    def save(self, output_name):
+         Exporter.export(output_name, self.data, self.index, self.language)
 
-    def execute(self): [self.update_and_export(i, copy.deepcopy(self.document)) for i in range(self.csv_tags.row_count)]
-
-    def update_and_export(self, index, new_doc):
-        self.change_variables(new_doc, index)
-        self.exporter.export(self.options.output_name, new_doc, index)
-
-    def reset_defaults(self, root):
-        for tag, _ in self.csv_tags.items():
-            if self.has_tag(tag): self.set_text(root, tag, self.svg_process.defaults[tag])
-
-    def change_variables(self, new_doc, index):
-        for name, data in self.csv_tags.items(): 
-            (tag_type, values) = data
-            self.change_variable(name, new_doc.getroot(), values, index, tag_type)
-
-    def change_variable(self, name, root, values, index, tag_type):
-        if self.has_tag(name): 
+    def change_variable(self, name: TagName, values: InputTagValues, tag_type: TagType, languages):
+        # self.debug(f"name {name} : {Tags.svg_tags}")
+        if Tags.svg_tags.has(name):
             match tag_type:
-                case TagType.TEXT: self.set_text(root, name, values[index])
-                case TagType.SVG: self.set_svg(root, name, values[index])
+                case TagType.TEXT: self.set_text(name, values, languages)
+                case TagType.SVG: self.set_svg(name, values, languages)
+    
+    def set_text(self, name: TagName, values: InputTagValues, languages): 
+        language = "None" if self.language not in languages else self.language
+        document_tag: DocumentTag = Tags.svg_tags.get(name)
+        if document_tag.type is  TagType.TEXT: self.root.getElementById(document_tag.id).text = values.get(self.index, language)
 
-    def set_svg(self, root, tag, path):
-        (tag_type, tag_id) = self.svg_process.tags[tag]
-        element = copy.deepcopy(self.csv_tags.svg_cache[path])
-        node = root.getElementById(tag_id)
+    def set_svg(self, name: TagName, values: InputTagValues, languages): 
+        language = "None" if self.language not in languages else self.language
+        self.debug(f"Set svg values for {name} : {values.get(self.index, language)}")
+        cache = SvgCache.get(values.get(self.index, language))
+        self.debug(cache)
+        element = copy.deepcopy(cache)
+        document_tag: DocumentTag = Tags.svg_tags.get(name)
+        node = self.root.getElementById(document_tag.id)
         parent = node.getparent()
         parent.remove(node)
         parent.add(element)
 
+class DocumentBuilder:
+    debug = None
+    data = None
+    root = None
+    language: str|None = None
+    def __init__(self, document, debug) -> None:
+        self.debug = debug
+        self.data = document
 
-    def has_tag(self, tag: str) -> bool: return tag in self.svg_process
-    def set_text(self, root, tag: str, text: str) -> None: 
-        (tag_type, tag_id) = self.svg_process.tags[tag]
-        if tag_type is  TagType.TEXT: root.getElementById(tag_id).text = text
+    def set_language(self, language:str ): self.language = language
+
+    def new(self, index: int) -> Document: return Document(self.data, index, self.language, self.debug)
+
+
+def get_languages(language_string: str): return language_string.split("|")
+    
+
+class VariablesReplacementExtension(inkex.base.TempDirMixin, inkex.TextExtension):
+
+    def effect(self):  
+        start = time.perf_counter()
+        Tags.csv_info = Tags.process_input(self.options.csv_file, self.debug) 
+        Tags.svg_tags: DocumentTags = Tags.process_document(self.document.getroot(), self.debug)
+        self.languages: list[str] = get_languages(self.options.translations)
+        Exporter.setup(self.options.format, self.tempdir, self.options.output_folder, options= {"dpi": self.options.dpi})
+        #self.debug(f"{Tags.csv_info.tags}")
+        #self.debug(f"{Tags.svg_tags}")
+
+        with tp() as ex:
+            document_builder = DocumentBuilder(self.document, self.debug)
+            for language in self.languages:
+                if language not in Tags.csv_info.languages: continue
+                self.debug(language)
+                document_builder.set_language(language)
+                for i in range(Tags.csv_info.count):
+                    new_document = document_builder.new(i)
+                    if self.options.parallel: ex.submit(new_document.update_and_save, self.options.output_name)
+                    else: new_document.update_and_save(self.options.output_name)
+
+        end = time.perf_counter()
+        self.debug("saves: Completed in {0} seconds.".format(end-start))
+
+
     def add_arguments(self, pars: ArgumentParser) -> None: Options.ProcessOptions(pars, self.debug)
-    def get_root(self): return self.document.getroot()
-    def get_nodes(self): return self.get_root().descendants()
     
 
 if __name__ == '__main__':
