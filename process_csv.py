@@ -48,7 +48,7 @@ class CSV(Processor):
                     if language is  None: language = "None"
                     languages.append(language)
                     if tag_type is TagType.SVG:
-                        SvgCache.add(value)
+                        SvgCache.add(value, debug)
                     tag_values[tag_name][index].set(value, language)
             for values in tag_values.values():
                 for value in values:

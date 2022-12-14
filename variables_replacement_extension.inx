@@ -26,6 +26,7 @@
         <option value="ps">PS</option><option value="eps">EPS</option>
       </param>
 
+      <param name="relative" type="boolean" gui-text="Relative paths">true</param>
       <param gui-text="DPI: " gui-description="The resolution for your exported raster images"
               name="dpi" type="int" min="1" max="10000">300</param>
       </hbox>

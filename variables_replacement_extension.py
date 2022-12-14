@@ -109,10 +109,18 @@ def get_languages(language_string: str): return language_string.split("|")
 class VariablesReplacementExtension(inkex.base.TempDirMixin, inkex.TextExtension):
 
     def effect(self):  
+        self.debug(self.absolute_href("/A.png"))
+        self.debug(self.absolute_href("./A.png"))
+        self.debug(self.absolute_href("\A.png"))
+        self.debug(self.absolute_href(".\A.png"))
         start = time.perf_counter()
+        if self.options.relative: 
+            SvgCache.set_relative()
+            SvgCache.set_relative_function(self.relative_to_absolute)
         Tags.csv_info = Tags.process_input(self.options.csv_file, self.debug) 
         Tags.svg_tags: DocumentTags = Tags.process_document(self.document.getroot(), self.debug)
         self.languages: list[str] = get_languages(self.options.translations)
+        
         Exporter.setup(self.options.format, self.tempdir, self.options.output_folder, options= {"dpi": self.options.dpi})
         #self.debug(f"{Tags.csv_info.tags}")
         #self.debug(f"{Tags.svg_tags}")
@@ -131,6 +139,8 @@ class VariablesReplacementExtension(inkex.base.TempDirMixin, inkex.TextExtension
         end = time.perf_counter()
         self.debug("saves: Completed in {0} seconds.".format(end-start))
 
+    @classmethod
+    def relative_to_absolute(cls, name): return cls.absolute_href(name)
 
     def add_arguments(self, pars: ArgumentParser) -> None: Options.ProcessOptions(pars, self.debug)
     
