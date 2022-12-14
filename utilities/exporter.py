@@ -1,6 +1,6 @@
 import os, inkex
 from inkex.command import write_svg, inkscape
-from _types import Language
+from utilities.typing import Language
 
 class Exporter:
     FORMATS: dict[str,str] = {

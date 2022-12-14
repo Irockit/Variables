@@ -1,5 +1,5 @@
-from _types import TagType
-from _parser import TagParser
+from utilities.typing import TagType
+from .parsing import TagParser
 
 class Processor:
     @classmethod

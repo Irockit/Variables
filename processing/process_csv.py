@@ -1,11 +1,11 @@
 import csv
-from tag_header import TagHeader, TextTagHeader, SVGTagHeader
-from _parser import TagParser
-from input_tag import InputInfo, InputTags, InputTagValues, TextInputTag, SvgInputTag, InputTagValue
-from language import process_language
-from _types import TagName, TagType, Language, Languages
-from processor import Processor
-from svg_cache import SvgCache
+from tag.input_tag import InputInfo, InputTags, InputTagValues, InputTagValue, TextInputTag, SvgInputTag
+from tag.tag_header import TagHeader, TextTagHeader, SVGTagHeader
+from .parsing import TagParser
+from utilities.language import process_language
+from utilities.typing import TagName, TagType, Language, Languages
+from .processor import Processor
+from utilities. svg_cache import SvgCache
 
 class CSV(Processor):
     @classmethod

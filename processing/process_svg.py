@@ -1,11 +1,12 @@
-from processor import Processor
-from document_tag import DocumentSvgTag, DocumentTextTag, NamedDocumentTag
-from document_tag import DocumentTags, DocumentTag
-from _types import TagType
-from _types import TagName, DocumentId, DefaultTagValue
-from inkex.elements import BaseElement, Anchor, Layer
-from utils import Target, is_text, remove_tspans
-from _parser import TagParser
+from .processor import Processor
+
+from tag.document_tag import DocumentTags, DocumentTag, NamedDocumentTag, DocumentTextTag, DocumentSvgTag
+
+from utilities.typing import TagType
+from utilities.typing import TagName, DocumentId, DefaultTagValue
+from inkex.elements import Anchor, Layer
+from utilities.utils import Target, is_text, remove_tspans
+from .parsing import TagParser
 from inkex.elements._selected import ElementList
 
 class SVG(Processor):
@@ -18,7 +19,6 @@ class SVG(Processor):
             (name, tag) = data
             tags.add(name, tag)
         return tags
-
 
     @classmethod
     def explore_document(cls, document, debug):

@@ -1,8 +1,8 @@
 from inkex.elements._selected import ElementList
-from input_tag import InputInfo
-from document_tag import DocumentTags
-from process_svg import SVG
-from process_csv import CSV
+from .input_tag import InputInfo
+from .document_tag import DocumentTags
+from processing.process_svg import SVG
+from processing.process_csv import CSV
 
 
 class Tags:

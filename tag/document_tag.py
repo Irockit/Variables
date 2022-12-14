@@ -1,4 +1,4 @@
-from _types import TagType, TagName, DocumentId, DefaultTagValue
+from utilities.typing import TagType, TagName, DocumentId, DefaultTagValue
 
 class DocumentTag:
     type: TagType 

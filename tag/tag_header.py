@@ -1,4 +1,4 @@
-from _types import TagName, TagType, Language
+from utilities.typing import TagName, TagType, Language
 
 class TagHeader:
     type: TagType

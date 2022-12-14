@@ -1,5 +1,5 @@
-from _types import Language, TagName, TagType, Languages
-from svg_cache import SvgCache
+from utilities.typing import Language, TagName, TagType, Languages
+
 
 
 class InputTagValue(dict[Language, str]):
