@@ -49,8 +49,7 @@ class VariablesReplacementExtension(inkex.base.TempDirMixin, inkex.TextExtension
         with tp() as ex:
             document_builder = DocumentBuilder(self.document, self.debug)
             for language in self.languages:
-                if language not in Tags.csv_info.languages: continue
-                self.debug(language)
+                if language not in Tags.csv_info.languages and language != "None": continue
                 document_builder.set_language(language)
                 for i in range(Tags.csv_info.count):
                     new_document = document_builder.new(i)
@@ -63,7 +62,7 @@ class VariablesReplacementExtension(inkex.base.TempDirMixin, inkex.TextExtension
     @classmethod
     def relative_to_absolute(cls, name): return cls.absolute_href(name)
 
-    def add_arguments(self, pars: ArgumentParser) -> None: Options.ProcessOptions(pars, self.debug)
+    def add_arguments(self, pars: ArgumentParser) -> None: Options.ProcessOptions(pars)
     
 
 if __name__ == '__main__':

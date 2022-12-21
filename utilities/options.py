@@ -16,6 +16,6 @@ class Options:
         }
 
     @classmethod
-    def ProcessOptions(cls, parser: ArgumentParser, debug):
+    def ProcessOptions(cls, parser: ArgumentParser):
         for name, args in cls.OPTIONS.items():
             parser.add_argument("--{0}".format(name), type=args[0], help=args[1],  **args[2])

@@ -15,6 +15,7 @@ class SvgCache:
 
     @classmethod
     def add(cls, path, debug): 
+        if path == "None":return
         if path not in cls.data:
             new_path = path if cls.absolute else cls.relative_function(path)
             debug(cls.relative_function(path))
@@ -22,7 +23,8 @@ class SvgCache:
             cls.data[path] = value
     
     @classmethod
-    def get(cls, path:str): return cls.data[path]
+    def get(cls, path:str): 
+        if path in cls.data: return cls.data[path]
 
     @classmethod
     def set_relative(cls): cls.absolute = False 

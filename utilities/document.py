@@ -37,7 +37,6 @@ class Document:
          Exporter.export(output_name, self.data, self.index, self.language)
 
     def change_variable(self, name: TagName, values: InputTagValues, tag_type: TagType, languages):
-        # self.debug(f"name {name} : {Tags.svg_tags}")
         if Tags.svg_tags.has(name):
             match tag_type:
                 case TagType.TEXT: self.set_text(name, values, languages)
@@ -50,9 +49,9 @@ class Document:
 
     def set_svg(self, name: TagName, values: InputTagValues, languages): 
         language = "None" if self.language not in languages else self.language
-        self.debug(f"Set svg values for {name} : {values.get(self.index, language)}")
+        self.debug(f"{self.index} | Set svg values for {name} : {values.get(self.index, language)}")
         cache = SvgCache.get(values.get(self.index, language))
-        self.debug(cache)
+        if cache is None: return
         element = copy.deepcopy(cache)
         document_tag: DocumentTag = Tags.svg_tags.get(name)
         node = self.root.getElementById(document_tag.id)
