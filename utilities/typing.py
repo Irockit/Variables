@@ -3,6 +3,7 @@ from enum import Enum, auto
 class TagType(Enum):
     TEXT = auto()
     SVG = auto()
+    GLOBAL = auto()
 
 
 class TagName(str): pass

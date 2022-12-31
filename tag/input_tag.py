@@ -17,7 +17,7 @@ class InputTagValues(list[InputTagValue|None]):
             self.append(tag)
 
     def get(self, index: int, language: Language):
-        if  language is None: language = "None"
+        if language is None: language = "None"
         if language in self[index]:
             return self[index][language]
 
@@ -42,10 +42,15 @@ class TextInputTag(InputTag):
     def __str__(self) -> str:
         return f"Text{super().__str__()}"
     
-
 class SvgInputTag(InputTag):
     def __init__(self, values: InputTagValues, languages: list[Language]):
         super().__init__(TagType.SVG, values, languages)
+    def __str__(self) -> str:
+        return f"SVG{super().__str__()}"
+
+class GlobalInputTag(InputTag):
+    def __init__(self, values: InputTagValues, languages: list[Language]):
+        super().__init__(TagType.GLOBAL, values, languages)
     def __str__(self) -> str:
         return f"SVG{super().__str__()}"
 

@@ -15,6 +15,8 @@ class DocumentTextTag(DocumentTag):
     def __init__(self, document_id: DocumentId, default: DefaultTagValue = None) -> None: super().__init__(TagType.TEXT, document_id, default)
 class DocumentSvgTag(DocumentTag):
     def __init__(self, document_id: DocumentId, default: DefaultTagValue = None) -> None: super().__init__(TagType.SVG, document_id, default)
+class DocumentGlobalTag(DocumentTag):
+    def __init__(self, document_id: DocumentId, default: DefaultTagValue = None) -> None: super().__init__(TagType.GLOBAL, document_id, default)
 
 class DocumentTags(dict[TagName, DocumentTag]):
     def add(self, name: TagName, tag: DocumentTag) -> None: self[name] = tag

@@ -1,11 +1,11 @@
 from .processor import Processor
 
-from tag.document_tag import DocumentTags, DocumentTag, NamedDocumentTag, DocumentTextTag, DocumentSvgTag
+from tag.document_tag import DocumentTags, DocumentTag, NamedDocumentTag, DocumentTextTag, DocumentSvgTag, DocumentGlobalTag
 
 from utilities.typing import TagType
 from utilities.typing import TagName, DocumentId, DefaultTagValue
 from inkex.elements import Anchor, Layer
-from utilities.utils import Target, is_text, remove_tspans
+from utilities.utils import Target, is_text, is_tspan, remove_tspans
 from .parsing import TagParser
 from inkex.elements._selected import ElementList
 
@@ -32,9 +32,6 @@ class SVG(Processor):
             data = cls.explore_element(child, debug)
             if data is not None: yield data
 
-    @classmethod
-
-        
 
     @classmethod
     def explore_element(cls, element, debug) -> NamedDocumentTag :
@@ -62,17 +59,34 @@ class SVG(Processor):
                 match tag_type:
                     case TagType.TEXT: 
                         # debug(name)
+                        #debug(f"{name} {element_id} {default}")
                         return (name, DocumentTextTag(element_id, default))
                     case TagType.SVG: 
                         # debug(name)
                         return (name, DocumentSvgTag(element_id, default))
+                    case TagType.GLOBAL: 
+                        # debug(name)
+                        return (name, DocumentGlobalTag(element_id, default))
     
     @classmethod
     def process_child(cls, element: Anchor, tag_type: TagType, debug) -> tuple[DocumentId, DefaultTagValue|None]|None:
         if element is None: return
-        child = element[0]
-        if is_text(child):
-            remove_tspans(child)
-            return (child.get_id(), child.text)
-        else:
-            return (child.get_id(), None)
+        dbg_str = ""
+        dbg_str += f"element: {element.get_id()}, {element.text}"
+        for child in element:
+            if is_text(child):
+                dbg_str += f"is text: {child.get_id()}, {child.text}"
+                #debug("is text")
+                for sub in child: 
+                    if is_tspan(sub):
+                        return cls.process_tspan(sub)
+                return (child.get_id(), child.text)
+            else:
+                debug(dbg_str)
+                return (child.get_id(), None)
+
+    @classmethod
+    def process_tspan(cls, element):
+        for child in element:
+            if is_tspan(child): return cls.process_tspan(child)
+        return (element.get_id(), element.text)

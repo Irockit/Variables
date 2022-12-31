@@ -19,6 +19,9 @@ class TagParser:
     def is_svg(tag: str) -> str|None : 
         '''Returns the text inside [] brackets'''
         return TagParser.is_match(tag, SQUARE_RE)
+    def is_global(tag: str) -> str|None : 
+        '''Returns the text inside () brackets'''
+        return TagParser.is_match(tag, ROUND_RE)
     def is_match(tag: str, patern: Pattern[str]) -> str|None:
         re_match = patern.match(tag)
         return re_match.group(1) if re_match else None

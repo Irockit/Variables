@@ -9,3 +9,5 @@ class Processor:
         if text_match is not None: return (text_match, TagType.TEXT)
         svg_match = TagParser.is_svg(tag)
         if svg_match is not None: return (svg_match, TagType.SVG)
+        svg_match = TagParser.is_global(tag)
+        if svg_match is not None: return (svg_match, TagType.GLOBAL)

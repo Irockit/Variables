@@ -33,6 +33,7 @@ from utilities.exporter import Exporter
 from utilities.svg_cache import SvgCache
 from utilities.language import get_languages
 from utilities.document import DocumentBuilder
+from tag.input_tag import GlobalInputTag, InputTagValues
 
 class VariablesReplacementExtension(inkex.base.TempDirMixin, inkex.TextExtension):
 
@@ -43,6 +44,9 @@ class VariablesReplacementExtension(inkex.base.TempDirMixin, inkex.TextExtension
             SvgCache.set_relative_function(self.relative_to_absolute)
         Tags.csv_info = Tags.process_input(self.options.csv_file, self.debug) 
         Tags.svg_tags: DocumentTags = Tags.process_document(self.document.getroot(), self.debug)
+        file_name_global = InputTagValues()
+        file_name_global.add({"None": self.options.output_name})
+        Tags.csv_info.tags.add("file_name", GlobalInputTag(file_name_global, ["None"]))
         self.languages: list[str] = get_languages(self.options.translations)
         Exporter.setup(self.options.format, self.tempdir, self.options.output_folder, options= {"dpi": self.options.dpi})
 
