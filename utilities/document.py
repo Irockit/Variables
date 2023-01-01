@@ -51,7 +51,6 @@ class Document:
     def set_global(self, name: TagName, values, languages): 
         language = "None" if self.language not in languages else self.language
         document_tag: DocumentTag = Tags.svg_tags.get(name)
-       
         if document_tag.type is TagType.GLOBAL:
             self.debug(f"setting global for : {name}  {document_tag.id} {values}")
             self.root.getElementById(document_tag.id).text = values.get(0, language)

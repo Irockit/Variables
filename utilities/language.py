@@ -17,3 +17,6 @@ def get_languages(language_string: str):
     languages = list(filter(lambda l: l != "",language_string.split("|")))
     if len(languages) >= 1:
         return languages 
+
+def get_translations(translation: str):
+    return get_languages(translation)
